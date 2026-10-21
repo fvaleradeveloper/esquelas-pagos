@@ -1,0 +1,57 @@
+{
+  "name": "esquelas-pagos-puerta-de-hierro",
+  "productName": "Esquelas de Pago - Puerta de Hierro",
+  "version": "1.0.0",
+  "description": "Sistema de gestion de lecturas, cobros y esquelas de pago del Condominio Puerta de Hierro",
+  "main": "electron.js",
+  "author": "Condominio Puerta de Hierro",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./vendor/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./src/tailwind.css -o ./vendor/css/tailwind.css --watch",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis portable"
+  },
+  "devDependencies": {
+    "electron": "^44.9.2",
+    "electron-builder": "^26.15.3",
+    "tailwindcss": "^3.4.19"
+  },
+  "build": {
+    "appId": "com.condominio.puertadehierro.esquelas",
+    "productName": "Esquelas de Pago - Puerta de Hierro",
+    "copyright": "Copyright (c) 2026 Condominio Puerta de Hierro",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron.js",
+      "index.html",
+      "assets/**/*",
+      "vendor/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Esquelas de Pago"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    }
+  }
+}

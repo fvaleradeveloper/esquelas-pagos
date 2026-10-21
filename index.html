@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condominio Puerta de Hierro - Gestión</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- jsPDF & AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a', // Azul marino profesional
+                        secondary: '#3b82f6',
+                        accent: '#f59e0b',
+                        surface: '#f3f4f6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .receipt-preview {
+            font-family: 'Courier New', monospace;
+            border: 2px dashed #cbd5e1;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-50 bg-primary text-white p-3 rounded-lg shadow-lg">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar-transition fixed lg:static inset-y-0 left-0 z-40 w-64 bg-primary text-white transform -translate-x-full lg:translate-x-0 flex flex-col shadow-2xl">
+            <div class="p-6 border-b border-blue-800">
+                <h1 class="text-xl font-bold tracking-wide"><i class="fas fa-building mr-2"></i>PUERTA DE HIERRO</h1>
+                <p class="text-xs text-blue-300 mt-1">Sistema de Gestión</p>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-1 px-3">
+                    <li>
+                        <button onclick="showSection('dashboard')" class="w-full flex items-center px-4 py-3 rounded-lg hover:bg-blue-800 transition-colors group nav-item active">
+                            <i class="fas fa-chart-line w-6"></i>
+                            <span class="font-medium">Dashboard</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('propietarios')" class="w-full flex items-center px-4 py-3 rounded-lg hover:bg-blue-800 transition-colors group nav-item">
+                            <i class="fas fa-users w-6"></i>
+                            <span class="font-medium">Propietarios</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('lecturas')" class="w-full flex items-center px-4 py-3 rounded-lg hover:bg-blue-800 transition-colors group nav-item">
+                            <i class="fas fa-tint w-6"></i>
+                            <span class="font-medium">Lecturas</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('finanzas')" class="w-full flex items-center px-4 py-3 rounded-lg hover:bg-blue-800 transition-colors group nav-item">
+                            <i class="fas fa-wallet w-6"></i>
+                            <span class="font-medium">Ingresos / Egresos</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('recibos')" class="w-full flex items-center px-4 py-3 rounded-lg hover:bg-blue-800 transition-colors group nav-item">
+                            <i class="fas fa-file-invoice-dollar w-6"></i>
+                            <span class="font-medium">Generar Recibos</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('configuracion')" class="w-full flex items-center px-4 py-3 rounded-lg hover:bg-blue-800 transition-colors group nav-item">
+                            <i class="fas fa-cog w-6"></i>
+                            <span class="font-medium">Configuración Tarifas</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="p-4 border-t border-blue-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold">Administrador</p>
+                        <p class="text-xs text-blue-300">Condominio</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-surface p-4 lg:p-8 relative">
+            
+            <!-- Header -->
+            <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h2 id="pageTitle" class="text-2xl font-bold text-slate-800">Dashboard</h2>
+                    <p class="text-slate-500 text-sm" id="currentDate"></p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="checkMorosos()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fab fa-whatsapp"></i> Alertar Morosos
+                    </button>
+                </div>
+            </header>
+
+            <!-- SECCION: DASHBOARD -->
+            <section id="dashboard" class="space-y-6 fade-in">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium">Total Propietarios</p>
+                                <h3 class="text-3xl font-bold text-primary mt-2" id="statTotalProp">0</h3>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-lg text-primary">
+                                <i class="fas fa-home"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium">Recaudación Mes</p>
+                                <h3 class="text-3xl font-bold text-green-600 mt-2" id="statRecaudacion">S/ 0.00</h3>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-lg text-green-600">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium">Deuda Pendiente</p>
+                                <h3 class="text-3xl font-bold text-red-600 mt-2" id="statDeuda">S/ 0.00</h3>
+                            </div>
+                            <div class="p-3 bg-red-100 rounded-lg text-red-600">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium">Tarifa Actual Agua</p>
+                                <h3 class="text-2xl font-bold text-secondary mt-2" id="statTarifa">S/ 5.60</h3>
+                                <p class="text-xs text-slate-400">Hasta 50m³</p>
+                            </div>
+                            <div class="p-3 bg-secondary/10 rounded-lg text-secondary">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Pagos Rápidos -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="font-bold text-lg text-slate-800">Control de Pagos - <span id="currentMonthYear"></span></h3>
+                        <button onclick="renderPagosTable()" class="text-primary hover:underline text-sm">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 text-slate-600 text-xs uppercase">
+                                <tr>
+                                    <th class="p-4 font-semibold">Chalet</th>
+                                    <th class="p-4 font-semibold">Propietario</th>
+                                    <th class="p-4 font-semibold">Consumo (m³)</th>
+                                    <th class="p-4 font-semibold">Monto Agua</th>
+                                    <th class="p-4 font-semibold">Mantenimiento</th>
+                                    <th class="p-4 font-semibold">Total</th>
+                                    <th class="p-4 font-semibold text-center">Estado</th>
+                                    <th class="p-4 font-semibold text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardTableBody" class="divide-y divide-slate-100 text-sm">
+                                <!-- JS Render -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCION: PROPIETARIOS -->
+            <section id="propietarios" class="hidden space-y-6 fade-in">
+                <div class="flex justify-between items-center">
+                    <div class="relative w-64">
+                        <input type="text" id="searchProp" placeholder="Buscar chalet o nombre..." 
+                               class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                               onkeyup="renderPropietarios()">
+                        <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                    </div>
+                    <button onclick="openModal('modalPropietario')" class="bg-primary hover:bg-blue-800 text-white px-6 py-2 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Nuevo Propietario
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-slate-600 text-xs uppercase">
+                            <tr>
+                                <th class="p-4">Chalet</th>
+                                <th class="p-4">Propietario</th>
+                                <th class="p-4">Teléfono</th>
+                                <th class="p-4 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="propietariosTableBody" class="divide-y divide-slate-100">
+                            <!-- JS Render -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECCION: LECTURAS -->
+            <section id="lecturas" class="hidden space-y-6 fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Formulario -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
+                        <h3 class="font-bold text-lg mb-4">Registrar Lectura</h3>
+                        <form id="formLectura" onsubmit="saveLectura(event)">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Chalet</label>
+                                    <select id="lecturaChalet" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" onchange="prellenarLecturaAnterior()">
+                                        <option value="">Seleccione...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Mes de Lectura</label>
+                                    <input type="month" id="lecturaMes" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" onchange="prellenarLecturaAnterior()">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1">Anterior (m³)</label>
+                                        <input type="number" id="lecturaAnteriorInput" step="0.01" min="0" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" oninput="previewLecturaConsumo()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1">Actual (m³)</label>
+                                        <input type="number" id="lecturaActualInput" step="0.01" min="0" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" oninput="previewLecturaConsumo()">
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded-lg text-sm flex justify-between items-center">
+                                    <span class="text-slate-600">Consumo calculado:</span>
+                                    <strong id="lecturaConsumoPreview" class="text-primary">0 m³</strong>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Observación (opcional)</label>
+                                    <input type="text" id="lecturaNota" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="Ej: Cambio de medidor">
+                                </div>
+                                <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-800 transition">Guardar Lectura</button>
+                            </div>
+                        </form>
+
+                        <div class="mt-5 pt-4 border-t border-slate-100 space-y-2">
+                            <button type="button" onclick="cargarDemoLecturas()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-flask"></i> Cargar Datos Demo
+                            </button>
+                            <button type="button" onclick="eliminarDatosDemo()" class="w-full border border-red-200 text-red-600 hover:bg-red-50 py-2 rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-eraser"></i> Eliminar Datos Demo
+                            </button>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Los datos demo se marcan con <span class="font-mono">demo: true</span> y pueden borrarse sin afectar tus lecturas reales.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Listado -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <h3 class="font-bold text-lg text-slate-800">Historial de Lecturas</h3>
+                            <button type="button" onclick="renderLecturas()" class="text-primary hover:underline text-sm">
+                                <i class="fas fa-sync-alt"></i> Actualizar
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 text-slate-600 text-xs uppercase">
+                                    <tr>
+                                        <th class="p-4">Chalet</th>
+                                        <th class="p-4">Propietario</th>
+                                        <th class="p-4">Mes</th>
+                                        <th class="p-4 text-right">Anterior</th>
+                                        <th class="p-4 text-right">Actual</th>
+                                        <th class="p-4 text-right">Consumo</th>
+                                        <th class="p-4 text-center">Origen</th>
+                                        <th class="p-4 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lecturasTableBody" class="divide-y divide-slate-100 text-sm">
+                                    <!-- JS Render -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCION: FINANZAS -->
+            <section id="finanzas" class="hidden space-y-6 fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Formulario -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
+                        <h3 class="font-bold text-lg mb-4">Registrar Movimiento</h3>
+                        <form id="formFinanzas" onsubmit="saveFinanza(event)">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
+                                    <select id="finanzaTipo" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+                                        <option value="ingreso">Ingreso</option>
+                                        <option value="egreso">Egreso</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                                    <input type="text" id="finanzaDesc" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="Ej: Recibo Sedapal Julio">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Monto (S/)</label>
+                                    <input type="number" id="finanzaMonto" step="0.01" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Fecha</label>
+                                    <input type="date" id="finanzaFecha" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+                                </div>
+                                <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-800 transition">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Balance y Lista -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-lg mb-4">Balance General</h3>
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                    <p class="text-sm text-green-600">Ingresos</p>
+                                    <p class="text-2xl font-bold text-green-700" id="balanceIngresos">S/ 0.00</p>
+                                </div>
+                                <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                                    <p class="text-sm text-red-600">Egresos</p>
+                                    <p class="text-2xl font-bold text-red-700" id="balanceEgresos">S/ 0.00</p>
+                                </div>
+                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p class="text-sm text-blue-600">Balance</p>
+                                    <p class="text-2xl font-bold text-blue-700" id="balanceTotal">S/ 0.00</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 text-slate-600 text-xs uppercase">
+                                    <tr>
+                                        <th class="p-4">Fecha</th>
+                                        <th class="p-4">Descripción</th>
+                                        <th class="p-4 text-right">Monto</th>
+                                        <th class="p-4 text-center">Tipo</th>
+                                        <th class="p-4 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="finanzasTableBody" class="divide-y divide-slate-100">
+                                    <!-- JS Render -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCION: RECIBOS / GENERACION -->
+            <section id="recibos" class="hidden space-y-6 fade-in">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-lg mb-4">Generar Esquela de Pago</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Seleccionar Chalet</label>
+                            <select id="reciboChalet" class="w-full p-2 border rounded-lg" onchange="loadLecturaActual()">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Mes de Cobro</label>
+                            <input type="month" id="reciboMes" class="w-full p-2 border rounded-lg">
+                        </div>
+                    </div>
+
+                    <div id="reciboForm" class="hidden space-y-4 border-t pt-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Lectura Anterior</label>
+                                <input type="number" id="lecturaAnterior" class="w-full p-2 border rounded-lg bg-slate-50" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Lectura Actual</label>
+                                <input type="number" id="lecturaActual" class="w-full p-2 border rounded-lg" oninput="calcularPreviewRecibo()">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-4 rounded-lg space-y-2 text-sm">
+                            <div class="flex justify-between"><span>Consumo (m³):</span> <strong id="previewConsumo">0</strong></div>
+                            <div class="flex justify-between"><span>Tarifa Agua:</span> <strong id="previewTarifa">S/ 5.60</strong></div>
+                            <div class="flex justify-between"><span>Monto Agua:</span> <strong id="previewMontoAgua">S/ 0.00</strong></div>
+                            <div class="flex justify-between"><span>Cuota Mantenimiento:</span> <strong id="previewMantenimiento">S/ 0.00</strong></div>
+                            <div class="flex justify-between border-t pt-2 mt-2 text-lg font-bold text-primary">
+                                <span>Total a Pagar:</span> 
+                                <span id="previewTotal">S/ 0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="generarPDFRecibo()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold shadow transition">
+                                <i class="fas fa-file-pdf mr-2"></i> Generar PDF
+                            </button>
+                            <button onclick="enviarWhatsAppRecibo()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold shadow transition">
+                                <i class="fab fa-whatsapp mr-2"></i> Enviar WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCION: CONFIGURACION -->
+            <section id="configuracion" class="hidden space-y-6 fade-in">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-2xl">
+                    <h3 class="font-bold text-lg mb-4">Configuración de Tarifas (Basado en Imagen 1)</h3>
+                    <form onsubmit="saveConfig(event)" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tarifa hasta 50 m³ (S/)</label>
+                                <input type="number" id="configTarifaBase" step="0.01" value="5.60" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tarifa exceso 50 m³ (S/)</label>
+                                <input type="number" id="configTarifaExceso" step="0.01" value="6.85" class="w-full p-2 border rounded-lg">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Cuota Mantenimiento Mensual (S/)</label>
+                            <input type="number" id="configMantenimiento" step="0.01" value="150.00" class="w-full p-2 border rounded-lg">
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-800">Guardar Configuración</button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h4 class="font-semibold text-blue-800 mb-2">Fórmula de Cálculo Automático</h4>
+                        <p class="text-sm text-blue-700 mb-2">El sistema puede calcular la tarifa automáticamente basado en los gastos del mes (Sedapal, Luz, Mantenimiento) y el consumo total.</p>
+                        <button onclick="calcularTarifaAutomatica()" class="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                            Calcular Tarifa del Mes Actual
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal Propietario -->
+    <div id="modalPropietario" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-100">
+            <h3 class="text-xl font-bold mb-4">Datos del Propietario</h3>
+            <form onsubmit="savePropietario(event)" class="space-y-4">
+                <input type="hidden" id="propId">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Número de Chalet</label>
+                    <select id="propChaletLetra" class="w-1/3 p-2 border rounded-l-lg inline-block">
+                        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                        <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                    </select>
+                    <input type="number" id="propChaletNum" required placeholder="#" class="w-1/4 p-2 border inline-block">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nombre Completo</label>
+                    <input type="text" id="propNombre" required class="w-full p-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Teléfono (WhatsApp)</label>
+                    <input type="tel" id="propTelefono" required placeholder="999888777" class="w-full p-2 border rounded-lg">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('modalPropietario')" class="flex-1 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">Cancelar</button>
+                    <button type="submit" class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-blue-800">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- ESTADO GLOBAL ---
+        const db = {
+            propietarios: JSON.parse(localStorage.getItem('ph_propietarios')) || [
+                { id: 1, chalet: 'A-01', nombre: 'Juan Pérez García', telefono: '987 654 321' },
+                { id: 2, chalet: 'B-02', nombre: 'María López Sánchez', telefono: '912 345 678' }
+            ],
+            finanzas: JSON.parse(localStorage.getItem('ph_finanzas')) || [],
+            lecturas: JSON.parse(localStorage.getItem('ph_lecturas')) || [],
+            config: JSON.parse(localStorage.getItem('ph_config')) || {
+                tarifaBase: 5.60,
+                tarifaExceso: 6.85,
+                mantenimiento: 150.00
+            },
+            pagos: JSON.parse(localStorage.getItem('ph_pagos')) || [] // {chalet, mes, pagado: bool, fechaPago}
+        };
+
+        // --- INICIALIZACION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('currentMonthYear').textContent = new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+            document.getElementById('reciboMes').value = new Date().toISOString().slice(0, 7);
+            document.getElementById('lecturaMes').value = new Date().toISOString().slice(0, 7);
+            
+            normalizarLecturas();
+            renderDashboard();
+            renderPropietarios();
+            renderFinanzas();
+            initLecturas();
+            updateConfigInputs();
+            
+            // Sidebar mobile
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleSidebar);
+
+            initEventDelegation();
+        });
+
+        // --- DELEGACION DE EVENTOS ---
+        // Evita handlers inline (onclick/onchange) con datos del usuario:
+        // el parser HTML decodifica las entidades antes de ejecutar el JS,
+        // por lo que escapar el valor NO seria suficiente.
+        function initEventDelegation() {
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if(!btn) return;
+
+                const action = btn.dataset.action;
+                const id = btn.dataset.id;
+                const chalet = btn.dataset.chalet;
+                const mes = btn.dataset.mes;
+
+                switch(action) {
+                    case 'edit-propietario':   editPropietario(id); break;
+                    case 'delete-propietario': deletePropietario(id); break;
+                    case 'delete-finanza':     deleteFinanza(id); break;
+                    case 'delete-lectura':     deleteLectura(id); break;
+                    case 'ver-recibo':         quickPrintRecibo(chalet, mes); break;
+                }
+            });
+
+            document.addEventListener('change', (e) => {
+                const el = e.target.closest('[data-action="toggle-pago"]');
+                if(!el) return;
+                togglePago(el.dataset.chalet, el.dataset.mes, el);
+            });
+        }
+
+        // --- NAVEGACION ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById('pageTitle').textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+            
+            // Update nav active state
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('bg-blue-800'));
+            event.currentTarget.classList.add('bg-blue-800');
+            
+            if(window.innerWidth < 1024) toggleSidebar();
+            
+            if(sectionId === 'dashboard') renderDashboard();
+            if(sectionId === 'propietarios') renderPropietarios();
+            if(sectionId === 'finanzas') renderFinanzas();
+            if(sectionId === 'lecturas') initLecturas();
+            if(sectionId === 'recibos') initReciboSection();
+        }
+
+        // --- CRUD PROPIETARIOS ---
+        function savePropietario(e) {
+            e.preventDefault();
+            const letra = document.getElementById('propChaletLetra').value;
+            const num = document.getElementById('propChaletNum').value;
+            const chalet = `${letra}-${num.padStart(2, '0')}`;
+            
+            const data = {
+                id: document.getElementById('propId').value || Date.now().toString(),
+                chalet,
+                nombre: document.getElementById('propNombre').value,
+                telefono: document.getElementById('propTelefono').value
+            };
+
+            // El id del formulario es string; los ids guardados pueden ser numericos
+            const index = db.propietarios.findIndex(p => String(p.id) === String(data.id));
+            if(index >= 0) db.propietarios[index] = data;
+            else db.propietarios.push(data);
+
+            localStorage.setItem('ph_propietarios', JSON.stringify(db.propietarios));
+            closeModal('modalPropietario');
+            renderPropietarios();
+            Swal.fire('Guardado', 'Propietario registrado correctamente', 'success');
+        }
+
+        function renderPropietarios() {
+            const tbody = document.getElementById('propietariosTableBody');
+            const search = document.getElementById('searchProp').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            db.propietarios
+                .filter(p => p.chalet.toLowerCase().includes(search) || p.nombre.toLowerCase().includes(search))
+                .sort((a,b) => a.chalet.localeCompare(b.chalet))
+                .forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-primary">${escapeHtml(p.chalet)}</td>
+                    <td class="p-4">${escapeHtml(p.nombre)}</td>
+                    <td class="p-4">${escapeHtml(p.telefono)}</td>
+                    <td class="p-4 text-center">
+                        <button data-action="edit-propietario" data-id="${escapeAttr(p.id)}" class="text-blue-600 hover:text-blue-800 mx-1"><i class="fas fa-edit"></i></button>
+                        <button data-action="delete-propietario" data-id="${escapeAttr(p.id)}" class="text-red-600 hover:text-red-800 mx-1"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editPropietario(id) {
+            const p = db.propietarios.find(x => String(x.id) === String(id));
+            if(!p) return;
+            document.getElementById('propId').value = p.id;
+            document.getElementById('propChaletLetra').value = p.chalet.charAt(0);
+            document.getElementById('propChaletNum').value = p.chalet.split('-')[1];
+            document.getElementById('propNombre').value = p.nombre;
+            document.getElementById('propTelefono').value = p.telefono;
+            openModal('modalPropietario');
+        }
+
+        function deletePropietario(id) {
+            Swal.fire({
+                title: '¿Eliminar?',
+                text: "No podrás revertir esto",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.propietarios = db.propietarios.filter(p => String(p.id) !== String(id));
+                    localStorage.setItem('ph_propietarios', JSON.stringify(db.propietarios));
+                    renderPropietarios();
+                    Swal.fire('Eliminado', '', 'success');
+                }
+            });
+        }
+
+        // --- CRUD FINANZAS ---
+        function saveFinanza(e) {
+            e.preventDefault();
+            const data = {
+                id: Date.now(),
+                tipo: document.getElementById('finanzaTipo').value,
+                descripcion: document.getElementById('finanzaDesc').value,
+                monto: parseFloat(document.getElementById('finanzaMonto').value),
+                fecha: document.getElementById('finanzaFecha').value
+            };
+            
+            db.finanzas.push(data);
+            localStorage.setItem('ph_finanzas', JSON.stringify(db.finanzas));
+            
+            document.getElementById('formFinanzas').reset();
+            renderFinanzas();
+            Swal.fire('Registrado', 'Movimiento guardado', 'success');
+        }
+
+        function renderFinanzas() {
+            const tbody = document.getElementById('finanzasTableBody');
+            tbody.innerHTML = '';
+            
+            let ingresos = 0, egresos = 0;
+            
+            db.finanzas.sort((a,b) => new Date(b.fecha) - new Date(a.fecha)).forEach(f => {
+                if(f.tipo === 'ingreso') ingresos += f.monto;
+                else egresos += f.monto;
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-4">${escapeHtml(f.fecha)}</td>
+                    <td class="p-4">${escapeHtml(f.descripcion)}</td>
+                    <td class="p-4 text-right font-mono">S/ ${f.monto.toFixed(2)}</td>
+                    <td class="p-4 text-center"><span class="px-2 py-1 rounded text-xs ${f.tipo === 'ingreso' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${escapeHtml(f.tipo.toUpperCase())}</span></td>
+                    <td class="p-4 text-center"><button data-action="delete-finanza" data-id="${escapeAttr(f.id)}" class="text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('balanceIngresos').textContent = `S/ ${ingresos.toFixed(2)}`;
+            document.getElementById('balanceEgresos').textContent = `S/ ${egresos.toFixed(2)}`;
+            document.getElementById('balanceTotal').textContent = `S/ ${(ingresos - egresos).toFixed(2)}`;
+        }
+
+        function deleteFinanza(id) {
+            // id llega como string desde data-id; comparar de forma flexible
+            db.finanzas = db.finanzas.filter(f => String(f.id) !== String(id));
+            localStorage.setItem('ph_finanzas', JSON.stringify(db.finanzas));
+            renderFinanzas();
+        }
+
+        // --- HELPERS LECTURAS ---
+        const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+        // Escapa texto para interpolarlo dentro de innerHTML
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Escapa un valor para usarlo dentro de un atributo HTML
+        function escapeAttr(str) {
+            return escapeHtml(str);
+        }
+
+        function formatearMes(mes) {
+            if(!mes) return '';
+            const partes = mes.split('-');
+            const anio = partes[0];
+            const idx = parseInt(partes[1], 10) - 1;
+            return `${MESES_ES[idx] || partes[1]} ${anio}`;
+        }
+
+        // Asegura que todas las lecturas tengan id, valores numericos y flag demo
+        function normalizarLecturas() {
+            db.lecturas = db.lecturas.filter(l => l && l.chalet && l.mes);
+            db.lecturas.forEach(l => {
+                if(!l.id) l.id = `L-${l.chalet}-${l.mes}`;
+                l.anterior = parseFloat(l.anterior) || 0;
+                l.actual = parseFloat(l.actual) || 0;
+                if(typeof l.demo !== 'boolean') l.demo = false;
+                if(typeof l.nota !== 'string') l.nota = '';
+            });
+        }
+
+        function renderLecturas() {
+            const tbody = document.getElementById('lecturasTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            if(db.lecturas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">No hay lecturas registradas</td></tr>`;
+                return;
+            }
+
+            db.lecturas
+                .slice()
+                .sort((a,b) => b.mes.localeCompare(a.mes) || a.chalet.localeCompare(b.chalet))
+                .forEach(l => {
+                    const prop = db.propietarios.find(p => p.chalet === l.chalet);
+                    const consumo = Math.max(0, l.actual - l.anterior);
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition';
+                    tr.innerHTML = `
+                        <td class="p-4 font-bold text-primary">${escapeHtml(l.chalet)}</td>
+                        <td class="p-4">${prop ? escapeHtml(prop.nombre) : '-'}</td>
+                        <td class="p-4">${escapeHtml(formatearMes(l.mes))}</td>
+                        <td class="p-4 text-right font-mono">${l.anterior.toFixed(2)}</td>
+                        <td class="p-4 text-right font-mono">${l.actual.toFixed(2)}</td>
+                        <td class="p-4 text-right font-mono font-semibold">${consumo.toFixed(2)} m³</td>
+                        <td class="p-4 text-center">
+                            <span class="px-2 py-1 rounded text-xs ${l.demo ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}">${l.demo ? 'DEMO' : 'REAL'}</span>
+                        </td>
+                        <td class="p-4 text-center">
+                            <button data-action="delete-lectura" data-id="${escapeAttr(l.id)}" class="text-red-600 hover:text-red-800" title="Eliminar lectura"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+        }
+
+        // --- CRUD LECTURAS ---
+        function initLecturas() {
+            const select = document.getElementById('lecturaChalet');
+            const valorActual = select.value;
+            select.innerHTML = '<option value="">Seleccione...</option>';
+            db.propietarios.slice().sort((a,b) => a.chalet.localeCompare(b.chalet)).forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.chalet;
+                opt.textContent = `${p.chalet} - ${p.nombre}`;
+                select.appendChild(opt);
+            });
+            select.value = valorActual;
+            renderLecturas();
+        }
+
+        function saveLectura(e) {
+            e.preventDefault();
+
+            const chalet = document.getElementById('lecturaChalet').value;
+            const mes = document.getElementById('lecturaMes').value;
+            const anteriorRaw = document.getElementById('lecturaAnteriorInput').value;
+            const actualRaw = document.getElementById('lecturaActualInput').value;
+            const nota = document.getElementById('lecturaNota').value.trim();
+
+            if(!chalet) {
+                Swal.fire('Seleccione un chalet', '', 'warning');
+                return;
+            }
+            if(!mes) {
+                Swal.fire('Seleccione el mes de lectura', '', 'warning');
+                return;
+            }
+            if(anteriorRaw === '' || actualRaw === '') {
+                Swal.fire('Faltan lecturas', 'Ingrese la lectura anterior y la actual', 'warning');
+                return;
+            }
+
+            const anterior = parseFloat(anteriorRaw);
+            const actual = parseFloat(actualRaw);
+
+            if(isNaN(anterior) || isNaN(actual) || anterior < 0 || actual < 0) {
+                Swal.fire('Lecturas invalidas', 'Los valores deben ser numeros mayores o iguales a cero', 'warning');
+                return;
+            }
+            if(actual < anterior) {
+                Swal.fire('Lectura regresiva', 'La lectura actual no puede ser menor que la anterior', 'warning');
+                return;
+            }
+
+            // Upsert por clave natural chalet + mes
+            const existente = db.lecturas.find(l => l.chalet === chalet && l.mes === mes);
+            if(existente) {
+                existente.anterior = anterior;
+                existente.actual = actual;
+                existente.nota = nota;
+                existente.demo = false;
+                existente.fechaRegistro = new Date().toISOString();
+            } else {
+                db.lecturas.push({
+                    id: Date.now().toString(),
+                    chalet,
+                    mes,
+                    anterior,
+                    actual,
+                    nota,
+                    demo: false,
+                    fechaRegistro: new Date().toISOString()
+                });
+            }
+
+            localStorage.setItem('ph_lecturas', JSON.stringify(db.lecturas));
+
+            document.getElementById('lecturaAnteriorInput').value = '';
+            document.getElementById('lecturaActualInput').value = '';
+            document.getElementById('lecturaNota').value = '';
+            previewLecturaConsumo();
+
+            renderLecturas();
+            renderDashboard();
+            Swal.fire('Lectura guardada', `${chalet} - ${formatearMes(mes)}`, 'success');
+        }
+
+        // Precarga la lectura anterior desde el mes previo o la ultima registrada
+        function prellenarLecturaAnterior() {
+            const chalet = document.getElementById('lecturaChalet').value;
+            const mes = document.getElementById('lecturaMes').value;
+            const inputAnterior = document.getElementById('lecturaAnteriorInput');
+            if(!inputAnterior) return;
+
+            if(!chalet || !mes) {
+                inputAnterior.value = '';
+                previewLecturaConsumo();
+                return;
+            }
+
+            const existente = db.lecturas.find(l => l.chalet === chalet && l.mes === mes);
+            if(existente) {
+                inputAnterior.value = existente.anterior;
+                document.getElementById('lecturaActualInput').value = existente.actual;
+                previewLecturaConsumo();
+                return;
+            }
+
+            // Mes inmediatamente anterior
+            const partes = mes.split('-');
+            const anio = parseInt(partes[0], 10);
+            const idx = parseInt(partes[1], 10) - 1;
+            const mesPrevio = new Date(anio, idx - 1, 1);
+            const mesPrevioStr = `${mesPrevio.getFullYear()}-${String(mesPrevio.getMonth() + 1).padStart(2, '0')}`;
+
+            const lecturaPrevia = db.lecturas.find(l => l.chalet === chalet && l.mes === mesPrevioStr);
+            if(lecturaPrevia) {
+                inputAnterior.value = lecturaPrevia.actual;
+            } else {
+                // Ultima lectura registrada del chalet anterior al mes elegido
+                const previas = db.lecturas
+                    .filter(l => l.chalet === chalet && l.mes < mes)
+                    .sort((a,b) => b.mes.localeCompare(a.mes));
+                inputAnterior.value = previas.length ? previas[0].actual : '';
+            }
+            previewLecturaConsumo();
+        }
+
+        function previewLecturaConsumo() {
+            const el = document.getElementById('lecturaConsumoPreview');
+            if(!el) return;
+            const anterior = parseFloat(document.getElementById('lecturaAnteriorInput').value);
+            const actual = parseFloat(document.getElementById('lecturaActualInput').value);
+            if(isNaN(anterior) || isNaN(actual)) {
+                el.textContent = '0 m³';
+                el.className = 'text-primary';
+                return;
+            }
+            const consumo = actual - anterior;
+            if(consumo < 0) {
+                el.textContent = 'Invalido (actual < anterior)';
+                el.className = 'text-red-600';
+                return;
+            }
+            el.textContent = `${consumo.toFixed(2)} m³`;
+            el.className = 'text-primary';
+        }
+
+        function deleteLectura(id) {
+            Swal.fire({
+                title: '¿Eliminar lectura?',
+                text: 'No se podra recuperar esta lectura',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Si, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.lecturas = db.lecturas.filter(l => String(l.id) !== String(id));
+                    localStorage.setItem('ph_lecturas', JSON.stringify(db.lecturas));
+                    renderLecturas();
+                    renderDashboard();
+                    Swal.fire('Eliminado', 'Lectura eliminada', 'success');
+                }
+            });
+        }
+
+        // Carga lecturas de prueba marcadas con demo: true
+        function cargarDemoLecturas() {
+            const hoy = new Date();
+            const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
+
+            const demoData = [];
+            let contador = 0;
+            db.propietarios.forEach(p => {
+                if(contador % 2 === 0) {
+                    const base = 100 + (contador * 7) % 50;
+                    demoData.push({
+                        id: `DEMO-${p.chalet}-${mesActual}`,
+                        chalet: p.chalet,
+                        mes: mesActual,
+                        anterior: base,
+                        actual: base + 12 + (contador % 9),
+                        nota: 'Lectura de prueba',
+                        demo: true,
+                        fechaRegistro: new Date().toISOString()
+                    });
+                }
+                contador++;
+            });
+
+            if(demoData.length === 0) {
+                Swal.fire('Sin datos', 'Registre propietarios para cargar lecturas demo', 'warning');
+                return;
+            }
+
+            // Reemplaza el demo previo del mismo chalet+mes y agrega el resto
+            demoData.forEach(d => {
+                const idx = db.lecturas.findIndex(l => l.chalet === d.chalet && l.mes === d.mes);
+                if(idx >= 0) {
+                    // No se pisa una lectura real existente
+                    if(db.lecturas[idx].demo) db.lecturas[idx] = d;
+                } else {
+                    db.lecturas.push(d);
+                }
+            });
+
+            localStorage.setItem('ph_lecturas', JSON.stringify(db.lecturas));
+            renderLecturas();
+            renderDashboard();
+            Swal.fire('Datos demo cargados', `${demoData.length} lecturas de prueba agregadas`, 'success');
+        }
+
+        function eliminarDatosDemo() {
+            const demoCount = db.lecturas.filter(l => l.demo).length;
+            if(demoCount === 0) {
+                Swal.fire('Sin datos demo', 'No hay lecturas demo para eliminar', 'info');
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Eliminar datos demo?',
+                text: `Se eliminaran ${demoCount} lecturas demo. Las lecturas reales no se veran afectadas.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Si, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.lecturas = db.lecturas.filter(l => !l.demo);
+                    localStorage.setItem('ph_lecturas', JSON.stringify(db.lecturas));
+                    renderLecturas();
+                    renderDashboard();
+                    Swal.fire('Datos demo eliminados', `${demoCount} lecturas eliminadas`, 'success');
+                }
+            });
+        }
+
+        // --- DASHBOARD & CALCULOS ---
+        function renderDashboard() {
+            document.getElementById('statTotalProp').textContent = db.propietarios.length;
+            document.getElementById('statTarifa').textContent = `S/ ${db.config.tarifaBase}`;
+            
+            renderPagosTable();
+        }
+
+        function renderPagosTable() {
+            // Calcular recaudación y deuda del mes actual
+            const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+            let recaudacion = 0;
+            let deudaTotal = 0;
+            
+            const tbody = document.getElementById('dashboardTableBody');
+            tbody.innerHTML = '';
+            
+            db.propietarios.slice().sort((a,b) => a.chalet.localeCompare(b.chalet)).forEach(p => {
+                // Buscar pago del mes
+                const pago = db.pagos.find(pg => pg.chalet === p.chalet && pg.mes === currentMonth);
+                const lectura = db.lecturas.find(l => l.chalet === p.chalet && l.mes === currentMonth);
+                
+                let consumo = 0;
+                let montoAgua = 0;
+                let totalMes = 0;
+                
+                if(lectura) {
+                    consumo = lectura.actual - lectura.anterior;
+                    montoAgua = calcularMontoAgua(consumo);
+                    totalMes = montoAgua + parseFloat(db.config.mantenimiento);
+                }
+                
+                const estaPagado = pago && pago.pagado;
+                const deuda = totalMes; // Simplificado: si no pagó, debe todo
+                
+                if(estaPagado) recaudacion += totalMes;
+                else deudaTotal += totalMes;
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-primary">${escapeHtml(p.chalet)}</td>
+                    <td class="p-4">${escapeHtml(p.nombre)}</td>
+                    <td class="p-4">${consumo} m³</td>
+                    <td class="p-4">S/ ${montoAgua.toFixed(2)}</td>
+                    <td class="p-4">S/ ${db.config.mantenimiento}</td>
+                    <td class="p-4 font-bold">S/ ${totalMes.toFixed(2)}</td>
+                    <td class="p-4 text-center">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" data-action="toggle-pago" data-chalet="${escapeAttr(p.chalet)}" data-mes="${escapeAttr(currentMonth)}" ${estaPagado ? 'checked' : ''}
+                                   class="form-checkbox h-5 w-5 text-green-600 rounded">
+                            <span class="ml-2 text-sm ${estaPagado ? 'text-green-600 font-semibold' : 'text-slate-400'}">
+                                ${estaPagado ? 'Pagado' : 'Pendiente'}
+                            </span>
+                        </label>
+                    </td>
+                    <td class="p-4 text-center">
+                        <button data-action="ver-recibo" data-chalet="${escapeAttr(p.chalet)}" data-mes="${escapeAttr(currentMonth)}" class="text-slate-400 hover:text-primary" title="Ver Recibo">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('statRecaudacion').textContent = `S/ ${recaudacion.toFixed(2)}`;
+            document.getElementById('statDeuda').textContent = `S/ ${deudaTotal.toFixed(2)}`;
+        }
+
+        function calcularMontoAgua(consumo) {
+            if(consumo <= 50) return consumo * db.config.tarifaBase;
+            return (50 * db.config.tarifaBase) + ((consumo - 50) * db.config.tarifaExceso);
+        }
+
+        async function togglePago(chalet, mes, elCheckbox = null) {
+            const index = db.pagos.findIndex(p => p.chalet === chalet && p.mes === mes);
+            const yaExiste = index >= 0;
+            const estaPagado = yaExiste ? db.pagos[index].pagado : false;
+            const seraPagado = !estaPagado;
+
+            // Calcular monto para mostrar en la confirmación
+            const lectura = db.lecturas.find(l => l.chalet === chalet && l.mes === mes);
+            let montoPago = 0;
+            if(lectura) {
+                const consumo = lectura.actual - lectura.anterior;
+                const montoAgua = calcularMontoAgua(consumo);
+                montoPago = montoAgua + parseFloat(db.config.mantenimiento);
+            }
+
+            const accion = seraPagado ? 'marcar como pagado' : 'desmarcar como pagado';
+            const montoTxt = montoPago > 0 ? ` por S/ ${montoPago.toFixed(2)}` : '';
+
+            const confirmado = await Swal.fire({
+                title: `¿${accion.charAt(0).toUpperCase() + accion.slice(1)}?`,
+                text: `Chalet ${chalet} - Mes ${mes}${montoTxt}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+
+            if(!confirmado.isConfirmed) {
+                // Revertir el cambio visual del checkbox si el usuario cancela
+                if(elCheckbox) elCheckbox.checked = estaPagado;
+                return;
+            }
+
+            if(yaExiste) {
+                db.pagos[index].pagado = seraPagado;
+                if(seraPagado) db.pagos[index].fechaPago = new Date().toISOString();
+                else db.pagos[index].fechaPago = null;
+            } else {
+                db.pagos.push({ chalet, mes, pagado: true, fechaPago: new Date().toISOString() });
+            }
+            localStorage.setItem('ph_pagos', JSON.stringify(db.pagos));
+
+            // --- Sincronizar ingreso en Finanzas ---
+            const pago = db.pagos.find(p => p.chalet === chalet && p.mes === mes);
+            const estaPagadoAhora = pago && pago.pagado;
+
+            // Eliminar ingreso previo de este pago si existe (evitar duplicados o al desmarcar)
+            db.finanzas = db.finanzas.filter(f =>
+                !(f.ref && f.ref.tipo === 'pago' && f.ref.chalet === chalet && f.ref.mes === mes)
+            );
+
+            if(estaPagadoAhora && montoPago > 0) {
+                db.finanzas.push({
+                    id: Date.now(),
+                    tipo: 'ingreso',
+                    descripcion: `Pago mensual - ${chalet} - ${mes}`,
+                    monto: montoPago,
+                    fecha: new Date().toISOString().slice(0, 10),
+                    ref: { tipo: 'pago', chalet, mes }
+                });
+            }
+
+            localStorage.setItem('ph_finanzas', JSON.stringify(db.finanzas));
+            renderDashboard();
+            renderFinanzas();
+        }
+
+        // --- RECIBOS & PDF ---
+        function initReciboSection() {
+            const select = document.getElementById('reciboChalet');
+            select.innerHTML = '<option value="">Seleccione Chalet...</option>';
+            db.propietarios.sort((a,b) => a.chalet.localeCompare(b.chalet)).forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.chalet;
+                opt.textContent = `${p.chalet} - ${p.nombre}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function loadLecturaActual() {
+            const chalet = document.getElementById('reciboChalet').value;
+            const mes = document.getElementById('reciboMes').value;
+            const form = document.getElementById('reciboForm');
+            
+            if(!chalet || !mes) {
+                form.classList.add('hidden');
+                return;
+            }
+            
+            form.classList.remove('hidden');
+            
+            // Buscar lectura anterior (mes anterior o última registrada)
+            // Simplificación: buscamos la última lectura registrada para este chalet
+            const lecturasChalet = db.lecturas.filter(l => l.chalet === chalet).sort((a,b) => b.mes.localeCompare(a.mes));
+            const ultimaLectura = lecturasChalet[0];
+            
+            document.getElementById('lecturaAnterior').value = ultimaLectura ? ultimaLectura.actual : 0;
+            document.getElementById('lecturaActual').value = '';
+            calcularPreviewRecibo();
+        }
+
+        function calcularPreviewRecibo() {
+            const ant = parseFloat(document.getElementById('lecturaAnterior').value) || 0;
+            const act = parseFloat(document.getElementById('lecturaActual').value) || 0;
+            const consumo = Math.max(0, act - ant);
+            
+            const montoAgua = calcularMontoAgua(consumo);
+            const mant = parseFloat(db.config.mantenimiento);
+            const total = montoAgua + mant;
+            
+            document.getElementById('previewConsumo').textContent = consumo;
+            document.getElementById('previewMontoAgua').textContent = `S/ ${montoAgua.toFixed(2)}`;
+            document.getElementById('previewMantenimiento').textContent = `S/ ${mant.toFixed(2)}`;
+            document.getElementById('previewTotal').textContent = `S/ ${total.toFixed(2)}`;
+        }
+
+        function generarPDFRecibo() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const chalet = document.getElementById('reciboChalet').value;
+            const prop = db.propietarios.find(p => p.chalet === chalet);
+            const mes = document.getElementById('reciboMes').value;
+            
+            const lecturaAnt = document.getElementById('lecturaAnterior').value;
+            const lecturaAct = document.getElementById('lecturaActual').value;
+            const consumo = parseInt(lecturaAct) - parseInt(lecturaAnt);
+            const montoAgua = calcularMontoAgua(consumo);
+            const mant = parseFloat(db.config.mantenimiento);
+            const total = montoAgua + mant;
+            
+            // Header
+            doc.setFontSize(18);
+            doc.text("CONDOMINIO PUERTA DE HIERRO", 105, 20, { align: "center" });
+            doc.setFontSize(12);
+            doc.text("Aviso de Cobranza AGUA - " + mes, 105, 30, { align: "center" });
+            
+            // Info Propietario
+            doc.setFontSize(10);
+            doc.text(`CHALET: ${chalet}`, 20, 50);
+            doc.text(`Propietario: ${prop.nombre}`, 20, 56);
+            
+            // Tabla de consumos
+            doc.autoTable({
+                startY: 70,
+                head: [['Concepto', 'Detalle', 'Monto (S/)']],
+                body: [
+                    ['Lectura Anterior', lecturaAnt, ''],
+                    ['Lectura Actual', lecturaAct, ''],
+                    ['Consumo del mes', `${consumo} m³`, ''],
+                    ['Tarifa Agua', `${consumo <= 50 ? db.config.tarifaBase : 'Mixta'}`, montoAgua.toFixed(2)],
+                    ['Cuota Mant. Bomba', 'Mensual', mant.toFixed(2)],
+                ],
+                theme: 'grid',
+                headStyles: { fillColor: [30, 58, 138] }
+            });
+            
+            // Total
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text(`TOTAL A PAGAR: S/ ${total.toFixed(2)}`, 105, finalY, { align: "right" });
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text("Fecha de emisión: " + new Date().toLocaleDateString(), 20, 280);
+            doc.text("Gracias por su puntualidad", 105, 280, { align: "center" });
+            
+            // Guardar/Abrir
+            doc.save(`Recibo_${chalet}_${mes}.pdf`);
+            
+            // Marcar como enviado (opcional)
+            Swal.fire('PDF Generado', 'El recibo se ha descargado', 'success');
+        }
+
+        function enviarWhatsAppRecibo() {
+            const chalet = document.getElementById('reciboChalet').value;
+            const prop = db.propietarios.find(p => p.chalet === chalet);
+            const total = document.getElementById('previewTotal').textContent;
+            const mes = document.getElementById('reciboMes').value;
+            
+            const msg = `Hola ${prop.nombre}, le enviamos su recibo de agua correspondiente al mes ${mes}. Total a pagar: ${total}. Chalet: ${chalet}. Gracias.`;
+            const url = `https://wa.me/51${prop.telefono}?text=${encodeURIComponent(msg)}`;
+            
+            window.open(url, '_blank');
+        }
+
+        // --- UTILIDADES & CONFIG ---
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            if(id === 'modalPropietario') document.getElementById('formFinanzas').reset(); // Reuse form reset logic if needed
+        }
+
+        function updateConfigInputs() {
+            document.getElementById('configTarifaBase').value = db.config.tarifaBase;
+            document.getElementById('configTarifaExceso').value = db.config.tarifaExceso;
+            document.getElementById('configMantenimiento').value = db.config.mantenimiento;
+        }
+
+        function saveConfig(e) {
+            e.preventDefault();
+            db.config.tarifaBase = parseFloat(document.getElementById('configTarifaBase').value);
+            db.config.tarifaExceso = parseFloat(document.getElementById('configTarifaExceso').value);
+            db.config.mantenimiento = parseFloat(document.getElementById('configMantenimiento').value);
+            localStorage.setItem('ph_config', JSON.stringify(db.config));
+            Swal.fire('Configuración', 'Tarifas actualizadas correctamente', 'success');
+        }
+
+        function calcularTarifaAutomatica() {
+            // Simulación basada en Imagen 1
+            // El usuario debería ingresar los gastos totales del mes
+            Swal.fire({
+                title: 'Cálculo Automático',
+                html: `
+                    <p class="mb-4 text-left text-sm">Ingrese los gastos totales del periodo:</p>
+                    <input type="number" id="calcSedapal" class="swal2-input" placeholder="Total Recibos Sedapal">
+                    <input type="number" id="calcLuz" class="swal2-input" placeholder="Total Recibos Luz">
+                    <input type="number" id="calcMant" class="swal2-input" placeholder="Mantenimiento Bomba">
+                    <input type="number" id="calcConsumo" class="swal2-input" placeholder="Consumo Total m3">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Calcular',
+                preConfirm: () => {
+                    const sedapal = parseFloat(document.getElementById('calcSedapal').value) || 0;
+                    const luz = parseFloat(document.getElementById('calcLuz').value) || 0;
+                    const mant = parseFloat(document.getElementById('calcMant').value) || 0;
+                    const consumo = parseFloat(document.getElementById('calcConsumo').value) || 1;
+                    
+                    // Fórmula Imagen 1: (Sedapal + Luz) / Consumo
+                    const costoM3 = (sedapal + luz) / consumo;
+                    const costoMantM3 = mant / consumo;
+                    const totalBase = costoM3 + costoMantM3;
+                    const conContingencia = totalBase * 1.10;
+                    
+                    return {
+                        tarifaCalculada: conContingencia.toFixed(2),
+                        detalle: `Base: ${totalBase.toFixed(2)} + 10%`
+                    };
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    db.config.tarifaBase = parseFloat(result.value.tarifaCalculada);
+                    localStorage.setItem('ph_config', JSON.stringify(db.config));
+                    updateConfigInputs();
+                    Swal.fire('Actualizado', `Nueva tarifa: S/ ${result.value.tarifaCalculada}`, 'success');
+                }
+            });
+        }
+
+        function checkMorosos() {
+            // Buscar propietarios con deuda (simplificado: sin pago en mes actual)
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const morosos = db.propietarios.filter(p => {
+                const pago = db.pagos.find(pg => pg.chalet === p.chalet && pg.mes === currentMonth);
+                return !pago || !pago.pagado;
+            });
+            
+            if(morosos.length === 0) {
+                Swal.fire('Sin Morosos', 'Todos los propietarios están al día', 'info');
+                return;
+            }
+            
+            let msg = "AVISO DE MOROSIDAD - Condominio Puerta de Hierro\n\nEstimados propietarios con deuda pendiente, recuerden regularizar su pago antes del día 3. Gracias.";
+            
+            // Crear link de broadcast (simulado abriendo wa.me para cada uno o grupo)
+            // Para simplificar, abrimos el primero o creamos un mensaje general
+            const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+        }
+
+        function quickPrintRecibo(chalet, mes) {
+            // Cargar datos en el formulario de recibos y mostrar preview
+            document.getElementById('reciboChalet').value = chalet;
+            document.getElementById('reciboMes').value = mes;
+            loadLecturaActual();
+            showSection('recibos');
+            // Forzar click en el botón de sección para actualizar UI
+            document.querySelector('button[onclick="showSection(\'recibos\')"]').click();
+        }
+    </script>
+</body>
+</html>
