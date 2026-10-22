@@ -234,6 +234,20 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Nota rápida / recordatorio -->
+                <div class="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 mt-1">
+                            <i class="fas fa-sticky-note text-amber-500 text-lg"></i>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">Recordatorio / notas</label>
+                            <textarea id="notaRecordatorio" rows="3" class="w-full p-3 border border-amber-300 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-amber-400 focus:outline-none resize-y" placeholder="Escribe aquí una nota rápida (se guarda automáticamente)..."></textarea>
+                            <p class="text-xs text-amber-500 mt-1">Se guarda automáticamente al escribir.</p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- SECCION: PROPIETARIOS -->
@@ -494,6 +508,22 @@
                             <label class="block text-sm font-medium mb-1">Cuota Mantenimiento Mensual (S/)</label>
                             <input type="number" id="configMantenimiento" step="0.01" value="150.00" class="w-full p-2 border rounded-lg">
                         </div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Mantenimiento Áreas Verdes (S/)</label>
+                                <input type="number" id="configMantAreasVerdes" step="0.01" value="30.00" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Productos de Limpieza (S/)</label>
+                                <input type="number" id="configProductosLimpieza" step="0.01" value="20.00" class="w-full p-2 border rounded-lg">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Días para aviso de mora</label>
+                                <input type="number" id="configDiasMora" step="1" min="0" value="5" class="w-full p-2 border rounded-lg">
+                            </div>
+                        </div>
                         <div class="pt-4">
                             <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-800">Guardar Configuración</button>
                         </div>
@@ -554,9 +584,13 @@
             config: JSON.parse(localStorage.getItem('ph_config')) || {
                 tarifaBase: 5.60,
                 tarifaExceso: 6.85,
-                mantenimiento: 150.00
+                mantenimiento: 150.00,
+                diasMora: 5,
+                mantenimientoAreasVerdes: 30.00,
+                productosLimpieza: 20.00
             },
-            pagos: JSON.parse(localStorage.getItem('ph_pagos')) || [] // {chalet, mes, pagado: bool, fechaPago}
+            pagos: JSON.parse(localStorage.getItem('ph_pagos')) || [], // {chalet, mes, pagado: bool, fechaPago}
+            notas: JSON.parse(localStorage.getItem('ph_notas')) || ''   // notas libre de usuario
         };
 
         // --- INICIALIZACION ---
@@ -573,6 +607,15 @@
             initLecturas();
             updateConfigInputs();
             
+            // Cargar nota guardada
+            const notaEl = document.getElementById('notaRecordatorio');
+            if (notaEl) {
+                notaEl.value = db.notas;
+                notaEl.addEventListener('input', () => {
+                    db.notas = notaEl.value;
+                    localStorage.setItem('ph_notas', db.notas);
+                });
+            }
             // Sidebar mobile
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleSidebar);
 
@@ -1111,7 +1154,9 @@
                 if(lectura) {
                     consumo = lectura.actual - lectura.anterior;
                     montoAgua = calcularMontoAgua(consumo);
-                    totalMes = montoAgua + parseFloat(db.config.mantenimiento);
+                    const mantAreasVerdes = parseFloat(db.config.mantenimientoAreasVerdes);
+                    const prodLimpieza = parseFloat(db.config.productosLimpieza);
+                    totalMes = montoAgua + parseFloat(db.config.mantenimiento) + mantAreasVerdes + prodLimpieza;
                 }
                 
                 const estaPagado = pago && pago.pagado;
@@ -1127,7 +1172,7 @@
                     <td class="p-4">${escapeHtml(p.nombre)}</td>
                     <td class="p-4">${consumo} m³</td>
                     <td class="p-4">S/ ${montoAgua.toFixed(2)}</td>
-                    <td class="p-4">S/ ${db.config.mantenimiento}</td>
+                    <td class="p-4">S/ ${(parseFloat(db.config.mantenimiento) + parseFloat(db.config.mantenimientoAreasVerdes) + parseFloat(db.config.productosLimpieza)).toFixed(2)}</td>
                     <td class="p-4 font-bold">S/ ${totalMes.toFixed(2)}</td>
                     <td class="p-4 text-center">
                         <label class="inline-flex items-center cursor-pointer">
@@ -1168,7 +1213,7 @@
             if(lectura) {
                 const consumo = lectura.actual - lectura.anterior;
                 const montoAgua = calcularMontoAgua(consumo);
-                montoPago = montoAgua + parseFloat(db.config.mantenimiento);
+                montoPago = montoAgua + parseFloat(db.config.mantenimiento) + parseFloat(db.config.mantenimientoAreasVerdes) + parseFloat(db.config.productosLimpieza);
             }
 
             const accion = seraPagado ? 'marcar como pagado' : 'desmarcar como pagado';
@@ -1285,7 +1330,9 @@
             const consumo = parseInt(lecturaAct) - parseInt(lecturaAnt);
             const montoAgua = calcularMontoAgua(consumo);
             const mant = parseFloat(db.config.mantenimiento);
-            const total = montoAgua + mant;
+            const mantAreasVerdes = parseFloat(db.config.mantenimientoAreasVerdes);
+            const prodLimpieza = parseFloat(db.config.productosLimpieza);
+            const total = montoAgua + mant + mantAreasVerdes + prodLimpieza;
             
             // Header
             doc.setFontSize(18);
@@ -1308,6 +1355,8 @@
                     ['Consumo del mes', `${consumo} m³`, ''],
                     ['Tarifa Agua', `${consumo <= 50 ? db.config.tarifaBase : 'Mixta'}`, montoAgua.toFixed(2)],
                     ['Cuota Mant. Bomba', 'Mensual', mant.toFixed(2)],
+                    ['Mant. Áreas Verdes', 'Mensual', mantAreasVerdes.toFixed(2)],
+                    ['Productos Limpieza', 'Mensual', prodLimpieza.toFixed(2)],
                 ],
                 theme: 'grid',
                 headStyles: { fillColor: [30, 58, 138] }
@@ -1358,6 +1407,9 @@
             document.getElementById('configTarifaBase').value = db.config.tarifaBase;
             document.getElementById('configTarifaExceso').value = db.config.tarifaExceso;
             document.getElementById('configMantenimiento').value = db.config.mantenimiento;
+            document.getElementById('configMantAreasVerdes').value = db.config.mantenimientoAreasVerdes;
+            document.getElementById('configProductosLimpieza').value = db.config.productosLimpieza;
+            document.getElementById('configDiasMora').value = db.config.diasMora;
         }
 
         function saveConfig(e) {
@@ -1365,6 +1417,9 @@
             db.config.tarifaBase = parseFloat(document.getElementById('configTarifaBase').value);
             db.config.tarifaExceso = parseFloat(document.getElementById('configTarifaExceso').value);
             db.config.mantenimiento = parseFloat(document.getElementById('configMantenimiento').value);
+            db.config.mantenimientoAreasVerdes = parseFloat(document.getElementById('configMantAreasVerdes').value);
+            db.config.productosLimpieza = parseFloat(document.getElementById('configProductosLimpieza').value);
+            db.config.diasMora = parseInt(document.getElementById('configDiasMora').value);
             localStorage.setItem('ph_config', JSON.stringify(db.config));
             Swal.fire('Configuración', 'Tarifas actualizadas correctamente', 'success');
         }
@@ -1423,7 +1478,8 @@
                 return;
             }
             
-            let msg = "AVISO DE MOROSIDAD - Condominio Puerta de Hierro\n\nEstimados propietarios con deuda pendiente, recuerden regularizar su pago antes del día 3. Gracias.";
+            const diasMora = db.config.diasMora || 5;
+            let msg = `AVISO DE MOROSIDAD - Condominio Puerta de Hierro\n\nEstimados propietarios con deuda pendiente, recuerden regularizar su pago antes de ${diasMora} días. Gracias.`;
             
             // Crear link de broadcast (simulado abriendo wa.me para cada uno o grupo)
             // Para simplificar, abrimos el primero o creamos un mensaje general
