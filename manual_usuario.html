@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Esquelas de Pago</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #1e3a8a; color: white; border-radius: 50%; font-weight: 700; font-size: 0.875rem; margin-right: 0.75rem; flex-shrink: 0; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #d97706; padding: 1rem; border-radius: 0.375rem; margin: 1rem 0; }
+        .info-box { background: #dbeafe; border-left: 4px solid #2563eb; padding: 1rem; border-radius: 0.375rem; margin: 1rem 0; }
+        .screen-shot { border: 2px solid #cbd5e1; border-radius: 0.5rem; padding: 0.5rem; background: white; margin: 1rem 0; }
+        .key { display: inline-block; background: #e5e7eb; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 8px; font-family: monospace; font-size: 0.875rem; margin: 0 2px; }
+        .page-break { page-break-after: always; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- PORTADA -->
+    <div class="max-w-2xl mx-auto p-8">
+        <div class="text-center py-12">
+            <div class="bg-primary w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-wallet text-white text-3xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-primary mb-4">Manual de Usuario</h1>
+            <h2 class="text-2xl text-slate-600 mb-2">Sistema de Gestión de Pagos</h2>
+            <p class="text-slate-500">Condominio Puerta de Hierro</p>
+            <p class="mt-4 text-sm text-slate-400">Versión 1.0 • Para usuarios poco familiarizados con computadoras</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mt-8">
+            <h3 class="text-lg font-bold mb-2">¿Qué es este programa?</h3>
+            <p class="mb-4">Es una herramienta sencilla para llevar el control de los pagos de mantenimiento y agua de los chalets del condominio. Con ella puedes:</p>
+            <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
+                <li>Ver quién ya pagó y quién debe.</li>
+                <li>Marcar los pagos como realizados.</li>
+                <li>Generar recibos en PDF para imprimir o enviar por WhatsApp.</li>
+                <li>Anotar recordatorios importantes.</li>
+            </ul>
+            <div class="warning-box">
+                <strong>⚠️ Importante:</strong> Toda la información se guarda <strong>solamente en esta computadora</strong>. No se sube a internet ni se comparte con otros equipos. Si cambias de computadora, los datos no se trasladan solos.
+            </div>
+        </div>
+
+        <div class="mt-8 text-center text-sm text-slate-500">
+            Condominio Puerta de Hierro &mdash; Sistema de Gestión de Pagos
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ÍNDICE -->
+    <div class="max-w-2xl mx-auto p-8">
+        <h1 class="text-3xl font-bold text-primary mb-6">Índice</h1>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <table class="w-full text-left">
+                <thead>
+                    <tr><th class="p-3 border-b text-slate-500">Sección</th><th class="p-3 border-b text-slate-500 text-right">Página</th></tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">1</span><a href="#inicio" class="text-primary hover:underline">Inicio y Pantalla Principal</a></td><td class="p-3 text-right">2</td></tr>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">2</span><a href="#pagos" class="text-primary hover:underline">Cómo marcar un pago como realizado</a></td><td class="p-3 text-right">3</td></tr>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">3</span><a href="#configuracion" class="text-primary hover:underline">Configuración de tarifas y montos</a></td><td class="p-3 text-right">4</td></tr>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">4</span><a href="#recibos" class="text-primary hover:underline">Generar y enviar recibos</a></td><td class="p-3 text-right">5</td></tr>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">5</span><a href="#notas" class="text-primary hover:underline">Usar el bloc de notas rápidas</a></td><td class="p-3 text-right">6</td></tr>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">6</span><a href="#morosos" class="text-primary hover:underline">Aviso de morosos (deudores)</a></td><td class="p-3 text-right">7</td></tr>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">7</span><a href="#finanzas" class="text-primary hover:underline">Ver ingresos y egresos</a></td><td class="p-3 text-right">8</td></tr>
+                    <tr class="border-b"><td class="p-3"><span class="step-badge">8</span><a href="#ayuda" class="text-primary hover:underline">Preguntas frecuentes</a></td><td class="p-3 text-right">9</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 1: INICIO -->
+    <div class="max-w-2xl mx-auto p-8" id="inicio">
+        <h1 class="text-3xl font-bold text-primary mb-6">1. Inicio y Pantalla Principal</h1>
+
+        <div class="info-box">
+            <strong>👉 Cómo abrir el programa:</strong><br>
+            1. Haz doble clic en el ícono del programa en tu escritorio.<br>
+            2. Se abrirá una ventana con un menú a la izquierda y pantallas principales a la derecha.
+        </div>
+
+        <div class="screen-shot mt-4">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="bg-slate-50 p-3 rounded border"><i class="fas fa-chart-line text-primary mr-2"></i><strong>Dashboard</strong> - Resumen y pagos del mes</div>
+                <div class="bg-slate-50 p-3 rounded border"><i class="fas fa-users text-primary mr-2"></i><strong>Propietarios</strong> - Lista de dueños de chalet</div>
+                <div class="bg-slate-50 p-3 rounded border"><i class="fas fa-tint text-primary mr-2"></i><strong>Lecturas</strong> - Registrar consumo de agua</div>
+                <div class="bg-slate-50 p-3 rounded border"><i class="fas fa-wallet text-primary mr-2"></i><strong>Ingresos / Egresos</strong> - Ver dinero recibido</div>
+                <div class="bg-slate-50 p-3 rounded border"><i class="fas fa-file-invoice-dollar text-primary mr-2"></i><strong>Generar Recibos</strong> - Crear recibos de pago</div>
+                <div class="bg-slate-50 p-3 rounded border"><i class="fas fa-cog text-primary mr-2"></i><strong>Configuración Tarifas</strong> - Cambiar precios y montos</div>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <h3 class="font-bold text-lg mb-2">En la pantalla principal (Dashboard) verás:</h3>
+            <ul class="list-disc pl-5 space-y-1 text-sm mb-4">
+                <li><strong>Total de propietarios:</strong> cuántos chalets hay registrados.</li>
+                <li><strong>Tarifa del agua:</strong> precio por metro cúbico.</li>
+                <li><strong>Recaudación:</strong> cuánto dinero se ha cobrado este mes.</li>
+                <li><strong>Deuda:</strong> cuánto dinero faltan por pagar.</li>
+                <li><strong>Tabla de pagos:</strong> lista de chalets con su estado (Pagado / Pendiente).</li>
+            </ul>
+        </div>
+
+        <div class="warning-box mt-6">
+            <strong>💡 Consejo:</strong> Si no ves la tabla de pagos, haz clic en el botón <key>Actualizar</key> que aparece arriba a la derecha de la tabla.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 2: PAGOS -->
+    <div class="max-w-2xl mx-auto p-8" id="pagos">
+        <h1 class="text-3xl font-bold text-primary mb-6">2. Cómo marcar un pago como realizado</h1>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+            <h3 class="font-bold text-lg mb-4">Pasos:</h3>
+
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <span class="step-badge">1</span>
+                    <div>
+                        <p class="font-semibold">Entra a la sección <strong>Dashboard</strong> (inicio).</p>
+                        <p class="text-sm text-slate-600">Es la primera opción del menú izquierdo.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">2</span>
+                    <div>
+                        <p class="font-semibold">Busca en la tabla el <strong>chalet y el mes actual</strong>.</p>
+                        <p class="text-sm text-slate-600">Cada fila es un chalet. En la última columna verás una casilla de verificación.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">3</span>
+                    <div>
+                        <p class="font-semibold">Haz clic en la casilla vacía (□) si el pago está <strong>pendiente</strong>.</p>
+                        <p class="text-sm text-slate-600">La casilla se pondrá marcada (✔) y el texto cambiará a <span class="text-green-600 font-bold">Pagado</span> en color verde.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">4</span>
+                    <div>
+                        <p class="font-semibold">El sistema guarda el cambio automáticamente.</p>
+                        <p class="text-sm text-slate-600">No hay botón de "guardar". Solo hacer clic en la casilla es suficiente.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">5</span>
+                    <div>
+                        <p class="font-semibold">Para desmarcar un pago (si te equivocaste):</p>
+                        <p class="text-sm text-slate-600">Vuelve a hacer clic en la casilla ya marcada y se desactivará.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen-shot">
+            <div class="flex items-center gap-3 mb-2">
+                <input type="checkbox" class="w-5 h-5 text-green-600 rounded" checked>
+                <span class="text-green-600 font-semibold text-sm">Pagado</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <input type="checkbox" class="w-5 h-5 text-slate-400 rounded">
+                <span class="text-slate-400 text-sm">Pendiente</span>
+            </div>
+        </div>
+
+        <div class="info-box mt-6">
+            <strong>✅ Resultado:</strong> Cuando marcas un pago como realizado, el sistema automáticamente lo registra como un ingreso en la sección <strong>Ingresos / Egresos</strong>. No necesitas hacer nada más.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 3: CONFIGURACIÓN -->
+    <div class="max-w-2xl mx-auto p-8" id="configuracion">
+        <h1 class="text-3xl font-bold text-primary mb-6">3. Configuración de tarifas y montos</h1>
+
+        <div class="warning-box mb-6">
+            <strong>⚠️ Solo para el administrador:</strong> Esta sección sirve para cambiar los precios. Si no estás seguro de qué valor poner, no lo cambies y consulta con la administración del condominio.
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="font-bold text-lg mb-4">Campos que puedes modificar:</h3>
+
+            <table class="w-full text-sm border-collapse mb-6">
+                <thead>
+                    <tr class="bg-slate-50">
+                        <th class="p-3 border text-left">Campo</th><th class="p-3 border text-left">Qué significa</th><th class="p-3 border text-center">Valor ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="p-3 border font-medium">Tarifa hasta 50 m³ (S/)</td><td class="p-3 border">Precio por metro cúbico de agua si el consumo es de 50 o menos.</td><td class="p-3 border text-center">5.60</td></tr>
+                    <tr><td class="p-3 border font-medium">Tarifa exceso 50 m³ (S/)</td><td class="p-3 border">Precio por metro cúbico si se pasa de 50 m³.</td><td class="p-3 border text-center">6.85</td></tr>
+                    <tr><td class="p-3 border font-medium">Cuota Mantenimiento Mensual (S/)</td><td class="p-3 border">Monto fijo que paga cada chalet por mantenimiento del edificio.</td><td class="p-3 border text-center">150.00</td></tr>
+                    <tr><td class="p-3 border font-medium">Mantenimiento Áreas Verdes (S/)</td><td class="p-3 border">Monto adicional por cuidado de jardines y áreas comunes.</td><td class="p-3 border text-center">30.00</td></tr>
+                    <tr><td class="p-3 border font-medium">Productos de Limpieza (S/)</td><td class="p-3 border">Monto adicional por productos de limpieza del condominio.</td><td class="p-3 border text-center">20.00</td></tr>
+                    <tr><td class="p-3 border font-medium">Días para aviso de mora</td><td class="p-3 border">Cuántos días se le dan a los morosos antes de enviarles el aviso.</td><td class="p-3 border text-center">5</td></tr>
+                </tbody>
+            </table>
+
+            <div class="pt-4">
+                <button class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-800">Guardar Configuración</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Nota:</strong> Después de hacer clic en <key>Guardar Configuración</key>, los cambios se aplican automáticamente a todos los recibos y cálculos del sistema.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 4: RECIBOS -->
+    <div class="max-w-2xl mx-auto p-8" id="recibos">
+        <h1 class="text-3xl font-bold text-primary mb-6">4. Generar y enviar recibos</h1>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+            <h3 class="font-bold text-lg mb-4">Pasos para crear un recibo:</h3>
+
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <span class="step-badge">1</span>
+                    <div>
+                        <p class="font-semibold">Ve al menú izquierdo y haz clic en <strong>Generar Recibos</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">2</span>
+                    <div>
+                        <p class="font-semibold">Selecciona el <strong>Chalet</strong> de la lista desplegable.</p>
+                        <p class="text-sm text-slate-600">Se seleccionará automáticamente el nombre del propietario.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">3</span>
+                    <div>
+                        <p class="font-semibold">Selecciona el <strong>Mes</strong> del recibo (ejemplo: 2026-10).</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">4</span>
+                    <div>
+                        <p class="font-semibold">Escribe la <strong>Lectura Anterior</strong> y la <strong>Lectura Actual</strong> del medidor de agua.</p>
+                        <p class="text-sm text-slate-600">El consumo se calculará solo.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">5</span>
+                    <div>
+                        <p class="font-semibold">Verás el <strong>Total a pagar</strong> en la parte inferior.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">6</span>
+                    <div>
+                        <p class="font-semibold">Haz clic en <key>Descargar PDF</key> para guardar el recibo en tu computadora.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <span class="step-badge">7</span>
+                    <div>
+                        <p class="font-semibold">Opcional: haz clic en <key>Enviar por WhatsApp</key> para abrir una conversación y enviarlo al propietario.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box mt-6">
+            <strong>📱 Sobre WhatsApp:</strong> Al hacer clic en enviar, se abrirá tu navegador web con un mensaje ya escrito. Solo debes elegir al contacto y presionar enviar. El número debe estar registrado en el propietario.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 5: NOTAS -->
+    <div class="max-w-2xl mx-auto p-8" id="notas">
+        <h1 class="text-3xl font-bold text-primary mb-6">5. Usar el bloc de notas rápidas</h1>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+            <h3 class="font-bold text-lg mb-4">¿Para qué sirve?</h3>
+            <p class="mb-4">Es un cuaderno digital pequeño que está en la pantalla principal (Dashboard), debajo de la tabla de pagos. Úsalo para escribir cosas como:</p>
+            <ul class="list-disc pl-5 space-y-1 text-sm mb-4">
+                <li>"Llamar al plomero el lunes".</li>
+                <li>"Entregar recibos el día 5".</li>
+                <li>"Revisar medidor del chalet B-02".</li>
+            </ul>
+
+            <h3 class="font-bold text-lg mb-2">Cómo usarlo:</h3>
+            <ol class="list-decimal pl-5 space-y-2 text-sm mb-4">
+                <li>Haz clic dentro del cuadro de texto que dice "Recordatorio / notas".</li>
+                <li>Escribe lo que necesites recordar.</li>
+                <li><strong>Se guarda solo</strong> mientras escribes. No hay botón de guardar.</li>
+                <li>Al día siguiente, al abrir el programa, tu nota seguirá ahí.</li>
+            </ol>
+        </div>
+
+        <div class="info-box">
+            <strong>⚠️ Limitación:</strong> Esta nota se guarda solamente en esta computadora. Si abres el programa desde otra computadora o celular, no verás lo que escribiste aquí.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 6: MOROSOS -->
+    <div class="max-w-2xl mx-auto p-8" id="morosos">
+        <h1 class="text-3xl font-bold text-primary mb-6">6. Aviso de morosos (deudores)</h1>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+            <h3 class="font-bold text-lg mb-4">¿Qué hace esta función?</h3>
+            <p class="mb-4">Busca automáticamente a los propietarios que <strong>aún no han pagado</strong> el mes actual y prepara un mensaje de aviso para enviarlos por WhatsApp.</p>
+
+            <h3 class="font-bold text-lg mb-2">Pasos:</h3>
+            <ol class="list-decimal pl-5 space-y-2 text-sm mb-4">
+                <li>Ve al menú izquierdo y haz clic en <strong>Ingresos / Egresos</strong>.</li>
+                <li>Busca el botón <strong>Verificar Morosos</strong> (o similar).</li>
+                <li>El sistema mostrará quiénes deben dinero.</li>
+                <li>Se abrirá un mensaje de WhatsApp listo para enviar a los deudores.</li>
+            </ol>
+
+            <div class="info-box">
+                <strong>📅 Días de mora:</strong> En la sección de Configuración puedes definir después de cuántos días se considera a alguien como moroso (por defecto son 5 días).
+            </div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 7: FINANZAS -->
+    <div class="max-w-2xl mx-auto p-8" id="finanzas">
+        <h1 class="text-3xl font-bold text-primary mb-6">7. Ver ingresos y egresos</h1>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+            <h3 class="font-bold text-lg mb-4">¿Qué verás aquí?</h3>
+            <p class="mb-4">Un resumen de todo el dinero que ha entrado al condominio. Cada vez que marcas un pago como "Pagado" en el Dashboard, ese monto aparece automáticamente aquí como un ingreso.</p>
+
+            <h3 class="font-bold text-lg mb-2">Columnas de la tabla:</h3>
+            <ul class="list-disc pl-5 space-y-1 text-sm mb-4">
+                <li><strong>Fecha:</strong> cuándo se registró el pago.</li>
+                <li><strong>Descripción:</strong> por ejemplo: "Pago mensual - A-01 - 2026-10".</li>
+                <li><strong>Tipo:</strong> siempre será "Ingreso" en esta sección.</li>
+                <li><strong>Monto:</strong> cuánto se pagó.</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Solo lectura:</strong> En esta sección no puedes borrar ni editar ingresos. Solo sirve para revisar lo que se ha cobrado.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 8: PREGUNTAS FRECUENTES -->
+    <div class="max-w-2xl mx-auto p-8" id="ayuda">
+        <h1 class="text-3xl font-bold text-primary mb-6">8. Preguntas frecuentes</h1>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="space-y-4">
+                <div class="border-b pb-3">
+                    <p class="font-bold">¿Puedo usar el programa en dos computadoras al mismo tiempo?</p>
+                    <p class="text-sm text-slate-600 mt-1">No. Los datos se guardan en la computadora donde instalaste el programa. Si lo usas en otra, no verás la misma información.</p>
+                </div>
+                <div class="border-b pb-3">
+                    <p class="font-bold">¿Se borran los datos si apago la computadora?</p>
+                    <p class="text-sm text-slate-600 mt-1">No. La información se guarda y permanece aunque apagues la computadora o reinicies el programa.</p>
+                </div>
+                <div class="border-b pb-3">
+                    <p class="font-bold">¿Qué hago si marqué un pago por error?</p>
+                    <p class="text-sm text-slate-600 mt-1">Vuelve al Dashboard, busca el chalet y vuelve a hacer clic en la casilla para desmarcarla. El pago volverá a estar como "Pendiente".</p>
+                </div>
+                <div class="border-b pb-3">
+                    <p class="font-bold">¿Puedo imprimir los recibos?</p>
+                    <p class="text-sm text-slate-600 mt-1">Sí. Al generar el recibo se descarga un archivo PDF. Abre ese archivo y dale imprimir como cualquier documento.</p>
+                </div>
+                <div class="border-b pb-3">
+                    <p class="font-bold">¿Necesito internet para usar el programa?</p>
+                    <p class="text-sm text-slate-600 mt-1">Solo para abrirlo la primera vez y para enviar WhatsApp. El resto funciona sin internet.</p>
+                </div>
+                <div>
+                    <p class="font-bold">¿A quién le pregunto si no entiendo algo?</p>
+                    <p class="text-sm text-slate-600 mt-1">Consulta con la administración del Condominio Puerta de Hierro o con la persona que instaló el programa.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <div class="bg-primary rounded-xl p-6 text-white">
+                <h3 class="text-lg font-bold mb-2">Condominio Puerta de Hierro</h3>
+                <p class="text-blue-100">Manual de Usuario - Sistema de Gestión de Pagos</p>
+                <p class="text-xs text-blue-200 mt-4">Versión 1.0</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
